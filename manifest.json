@@ -1,0 +1,10 @@
+{
+  "name": "Debug Utils",
+  "version": "0.1",
+  "description": "HotSwap JavaScript code",
+  "devtools_page": "devtools.html",
+  "manifest_version": 2,
+  "permissions": [
+    "debugger",
+  ]
+}
