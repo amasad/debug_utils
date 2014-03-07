@@ -82,6 +82,31 @@ function genDebuggerStatement(fn) {
   return '\n// ' + id + '\ndebugger;\n';
 }
 
+function removeDebuggerStatement(sourceFile, fnSource, fn) {
+  assert(fn.__$duuid, 'Function was not debugged by $duf()');
+  var id = fn.__$duuid;
+  var source = getSource(fn);
+  var lines = source.split('\n');
+  assert(
+    lines[1] === '// ' + id, 'Cannot find my debugger statement.'
+  );
+  assert(
+    lines[2] === 'debugger;', 'Cannot find my debugger statement.'
+  );
+  lines.splice(1, 2);
+  source = lines.join('\n');
+  sourceFile.setContent(
+    source,
+    function(status) {
+      assert(
+        status.code === 'OK',
+        'Error updating source code for file ' + sourceFile.url
+      );
+      console.log('Debugger statement removed succesfully');
+    }
+  )
+}
+
 function addDebuggerStatment(sourceFile, fnSource, fn) {
   var m = fnSource.match(/^function\s+[^\(]*\([^\)]*\)\s*\{/);
   if (!m) throw new Error('Error parsing function source.');
@@ -91,17 +116,17 @@ function addDebuggerStatment(sourceFile, fnSource, fn) {
   sourceFile.setContent(
     sourceFile.getContent().replace(fnSource, modified),
     function(status) {
-      if (status.code !== 'OK') {
-        throw new Error('Error updating source');
-      } else {
-        console.log('Debugger statement added succesfully');
-      }
+      assert(
+        status.code === 'OK',
+        'Error updating source code for file ' + sourceFile.url
+      );
+      console.log('Debugger statement added succesfully');
     }
   );
 }
 
-function $duf(ref, url) {
-  console.log('working');
+function getSource(ref) {
+  assert(typeof ref === 'function', ref + ' is not a function.');
 
   var source = ref.toString();
 
@@ -109,6 +134,10 @@ function $duf(ref, url) {
     throw new Error('Can\'t step debug native code, try $dum()');
   }
 
+  return source;
+}
+
+function getResourceFor(source, url, callback) {
   chromeAPI.getResources(function(resources) {
     var sourceFiles = resources.filter(function(res) {
       if (url && res.url.indexOf(url) === -1) {
@@ -126,7 +155,25 @@ function $duf(ref, url) {
         'Try supplying a resource url or using $dum()'
       );
     }
-    addDebuggerStatment(sourceFile, source, ref);
+    callback && callback(sourceFile);
+  });
+}
+
+function $duf(ref, url) {
+  console.log('working');
+
+  var source = getSource(ref);
+
+  getResourceFor(source, url, function(resource) {
+    addDebuggerStatment(resource, source, ref);
+  });
+}
+
+function $dufr(ref, url) {
+  var source = getSource(ref);
+
+  getResourceFor(source, url, function (resource) {
+    removeDebuggerStatement(resource, source, ref);
   });
 }
 
@@ -139,7 +186,8 @@ if (typeof module === 'object' && typeof exports === 'object') {
     $duv: $duv,
     $duvl: $duvl,
     $duvr: $duvr,
-    $duf: $duf
+    $duf: $duf,
+    $dufr: $dufr
   };
 }
 

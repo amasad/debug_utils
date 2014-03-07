@@ -2,7 +2,7 @@ var du = require('../du');
 var assert = require('assert');
 var EventEmitter = require('events').EventEmitter;
 
-describe('$duv, $duvl', function() {
+describe('$duv, $duvl, $duvr', function() {
 
   it('should attach a debug event listener', function() {
     var o = new EventEmitter();
@@ -34,7 +34,7 @@ describe('$duv, $duvl', function() {
 });
 
 
-describe('$duf', function() {
+describe('$duf, $dufr', function() {
 
   function important(a, b) {
    // we need to do important stuff
@@ -51,8 +51,9 @@ describe('$duf', function() {
       '   var foo = 1;',
       '   function log(x){ console.log(x) }',
       '   // log foo for lulz',
-      '   log(foo);',
+      '   log.bind(null, foo);',
       important.toString(),
+      '   return important;',
       '})();'
     ].join('\n'),
     getContent: function() { return this.content; },
@@ -69,6 +70,14 @@ describe('$duf', function() {
   it('should add a debugger statement to function source', function() {
     du.$duf(important);
     assert(resource.content.match(/debugger/));
+    var id = important.__$duuid;
+    important = eval(resource.content);
+    important.__$duuid = id;
+  });
+
+  it('should remove debugger statement', function() {
+    du.$dufr(important);
+    assert(!resource.content.match(/debugger/));
   });
 
 });
