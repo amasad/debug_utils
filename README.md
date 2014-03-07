@@ -27,6 +27,10 @@ multiple functions with the _exact_ same source. See `$dum` to debug a method.
 
 Logs the arguments passed to the function.
 
+### $dufr(function ref)
+
+Removes previosly set debugger or log statement.
+
 ### $dum(object, method)
 
 Wraps an object's method with a wrapper function with a debugger statement so

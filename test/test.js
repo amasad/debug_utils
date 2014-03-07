@@ -70,14 +70,22 @@ describe('$duf, $dufr', function() {
   it('should add a debugger statement to function source', function() {
     du.$duf(important);
     assert(resource.content.match(/debugger/));
-    var id = important.__$duuid;
-    important = eval(resource.content);
-    important.__$duuid = id;
   });
 
   it('should remove debugger statement', function() {
+    var id = important.__$duuid;
+    important = eval(resource.content);
+    important.__$duuid = id;
     du.$dufr(important);
     assert(!resource.content.match(/debugger/));
   });
 
+  it('should add log statements', function () {
+    important = eval(resource.content);
+    du.$dufl(important);
+    assert(resource.content.match(/console.log\(arguments\)/));
+  });
+
+  it('should handle conflicts between log and debug');
+  it('should not deform function');
 });

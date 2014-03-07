@@ -71,7 +71,7 @@ function $duvr(object, event) {
   });
 }
 
-function genDebuggerStatement(fn) {
+function genInjection(fn, injectedCode) {
   var id = uid();
   Object.defineProperty(fn, '__$duuid', {
     value: id,
@@ -79,7 +79,7 @@ function genDebuggerStatement(fn) {
     enumerable: false,
     writable: false
   });
-  return '\n// ' + id + '\ndebugger;\n';
+  return '\n// ' + id + '\n' + injectedCode;
 }
 
 function removeDebuggerStatement(sourceFile, fnSource, fn) {
@@ -91,12 +91,14 @@ function removeDebuggerStatement(sourceFile, fnSource, fn) {
     lines[1] === '// ' + id, 'Cannot find my debugger statement.'
   );
   assert(
-    lines[2] === 'debugger;', 'Cannot find my debugger statement.'
+    lines[2] === 'debugger;' ||
+      lines[2] === 'console.log(arguments);',
+    'Cannot find my debugger statement.'
   );
   lines.splice(1, 2);
-  source = lines.join('\n');
+  modified = lines.join('\n');
   sourceFile.setContent(
-    source,
+    sourceFile.getContent().replace(fnSource, modified),
     function(status) {
       assert(
         status.code === 'OK',
@@ -107,12 +109,14 @@ function removeDebuggerStatement(sourceFile, fnSource, fn) {
   )
 }
 
-function addDebuggerStatment(sourceFile, fnSource, fn) {
+function injectStatement(sourceFile, fnSource, fn, injectedCode) {
   var m = fnSource.match(/^function\s+[^\(]*\([^\)]*\)\s*\{/);
   if (!m) throw new Error('Error parsing function source.');
   var len = m[0].length;
   var modified =
-    fnSource.substr(0, len) + genDebuggerStatement(fn) + fnSource.substr(len);
+    fnSource.substr(0, len) +
+    genInjection(fn, injectedCode) +
+    fnSource.substr(len);
   sourceFile.setContent(
     sourceFile.getContent().replace(fnSource, modified),
     function(status) {
@@ -120,9 +124,17 @@ function addDebuggerStatment(sourceFile, fnSource, fn) {
         status.code === 'OK',
         'Error updating source code for file ' + sourceFile.url
       );
-      console.log('Debugger statement added succesfully');
+      console.log('Debug statement added succesfully');
     }
   );
+}
+
+function addLogStatement(sourceFile, fnSource, fn) {
+  injectStatement(sourceFile, fnSource, fn, 'console.log(arguments);');
+}
+
+function addDebuggerStatment(sourceFile, fnSource, fn) {
+  injectStatement(sourceFile, fnSource, fn, 'debugger;');
 }
 
 function getSource(ref) {
@@ -160,12 +172,18 @@ function getResourceFor(source, url, callback) {
 }
 
 function $duf(ref, url) {
-  console.log('working');
-
   var source = getSource(ref);
 
   getResourceFor(source, url, function(resource) {
     addDebuggerStatment(resource, source, ref);
+  });
+}
+
+function $dufl(ref, url) {
+  var source = getSource(ref);
+
+  getResourceFor(source, url, function(resource) {
+    addLogStatement(resource, source, ref);
   });
 }
 
@@ -187,6 +205,7 @@ if (typeof module === 'object' && typeof exports === 'object') {
     $duvl: $duvl,
     $duvr: $duvr,
     $duf: $duf,
+    $dufl: $dufl,
     $dufr: $dufr
   };
 }
