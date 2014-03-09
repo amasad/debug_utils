@@ -1,4 +1,22 @@
 /**
+ * Export for testing.
+ */
+
+if (typeof module === 'object' && typeof exports === 'object') {
+  module.exports = {
+    $duv: $duv,
+    $duvl: $duvl,
+    $duvr: $duvr,
+    $duf: $duf,
+    $dufl: $dufl,
+    $dufr: $dufr,
+    $dum: $dum,
+    $duml: $duml,
+    $dumr: $dumr
+  };
+}
+
+/**
  *
  * Event debugging
  * ---------------
@@ -269,19 +287,66 @@ function $dufr(ref, url) {
   });
 }
 
+
 /**
- * Export for testing.
+ *
+ * Method Debugging
+ * ----------------
+ *
  */
 
-if (typeof module === 'object' && typeof exports === 'object') {
-  module.exports = {
-    $duv: $duv,
-    $duvl: $duvl,
-    $duvr: $duvr,
-    $duf: $duf,
-    $dufl: $dufl,
-    $dufr: $dufr
-  };
+var wrappedMethods = [];
+
+function wrapMethod(object, methodName, isLog) {
+  assert(
+    typeof object === 'object' &&
+      object && typeof object[methodName] === 'function',
+    'Illegal object or failed to find method.'
+  );
+
+  var method = object[methodName];
+
+  wrappedMethods.push({
+    object: object,
+    method: method
+  });
+
+  var slice = [].slice;
+  var replacement;
+
+  if (isLog) {
+    replacement = function() {
+      console.log(arguments);
+      return method.apply(object, slice.call(arguments));
+    };
+  } else {
+    replacement = function() {
+      debugger;
+      return method.apply(object, slice.call(arguments));
+    };
+  }
+
+  object[methodName] = replacement;
+}
+
+function $dum(object, method) {
+  wrapMethod(object, method);
+}
+
+function $duml(object, method) {
+  wrapMethod(object, method, true);
+}
+
+function $dumr(object, method) {
+  for (var i = 0; i < wrappedMethods.length; i++) {
+    var item = wrappedMethods[i];
+    if (item.object === object) {
+      object[method] = item.method;
+      wrappedMethods.splice(i, 1);
+      return true;
+    }
+  }
+  return false;
 }
 
 /**

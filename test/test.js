@@ -81,11 +81,44 @@ describe('$duf, $dufr', function() {
     assert(!this.resource.content.match(/debugger/));
   });
 
-  it('should add log statements', function () {
+  it('should add log statements', function() {
     du.$dufl(this.important);
     assert(this.resource.content.match(/console.log\(arguments\)/));
   });
 
   it('should handle conflicts between log and debug');
   it('should not deform function');
+});
+
+describe('$dum, $duml, $dumr', function() {
+
+  beforeEach(function() {
+    this.obj = {
+      foo: function(a, b, c) {
+        assert(a === 1 && b === 2 && c === 3, 'wrong args');
+        return a + b + c;
+      }
+    }
+  });
+
+  it('should wrap a method with a debugger statement', function() {
+    du.$dum(this.obj, 'foo');
+    assert(this.obj.foo.toString().match(/debugger/));
+    assert.equal(this.obj.foo(1, 2, 3), 6);
+  });
+
+  it('should wrap a method with a logger statement', function() {
+    du.$duml(this.obj, 'foo');
+    assert(this.obj.foo.toString().match(/console.log/));
+    assert.equal(this.obj.foo(1, 2, 3), 6);
+  });
+
+  it('should removed wrapped method', function() {
+    du.$dum(this.obj, 'foo');
+    du.$dumr(this.obj, 'foo');
+    assert(!this.obj.foo.toString().match(/debugger/));
+  });
+
+  it('should handle exit wrapping for already wrapped functions');
+
 });

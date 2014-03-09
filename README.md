@@ -39,10 +39,16 @@ the function you can just use `$duf`.
 
 ### $duml(object, method)
 
+### $dumr(object, method)
+
 ### $dug(object, property)
 
 Debug when something tries to get at a `property` of an `object.
 
 ### $dus
 
+Debug when something tries to get at a `property` of an `object.
+
 ### $dugs
+
+Debug when something tries to get at a `property` of an `object.
