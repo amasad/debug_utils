@@ -36,54 +36,54 @@ describe('$duv, $duvl, $duvr', function() {
 
 describe('$duf, $dufr', function() {
 
-  function important(a, b) {
-   // we need to do important stuff
-   var added = a + b;
-   var subtracted = a - b;
-   // we gotta step up our game',
-   return added - subtracted * added + subtracted;
-  }
-
-  var resource = {
-    url: 'script.js',
-    content: [
-      '(function() {',
-      '   var foo = 1;',
-      '   function log(x){ console.log(x) }',
-      '   // log foo for lulz',
-      '   log.bind(null, foo);',
-      important.toString(),
-      '   return important;',
-      '})();'
-    ].join('\n'),
-    getContent: function() { return this.content; },
-    setContent: function(content, cb) {
-      this.content = content;
-      cb({code: 'OK'})
+  beforeEach(function() {
+    this.important = function(a, b) {
+     // we need to do important stuff
+     var added = a + b;
+     var subtracted = a - b;
+     // we gotta step up our game',
+     return added - subtracted * added + subtracted;
+    };
+    var resource = this.resource = {
+      url: 'script.js',
+      content: [
+        '(function() {',
+        '   var foo = 1;',
+        '   function log(x){ console.log(x) }',
+        '   // log foo for lulz',
+        '   log.bind(null, foo);',
+        '   var important = ' + this.important.toString(),
+        '   return important;',
+        '})();'
+      ].join('\n'),
+      getContent: function() { return this.content; },
+      setContent: function(content, cb) {
+        this.content = content;
+        cb({code: 'OK'})
+      }
     }
-  };
-
-  var chromeAPI = {};
-  chromeAPI.getResources = function(cb) {cb([resource])};
-  global.chromeAPI = chromeAPI;
+    var chromeAPI = {};
+    chromeAPI.getResources = function(cb) {cb([resource])};
+    global.chromeAPI = chromeAPI;
+  });
 
   it('should add a debugger statement to function source', function() {
-    du.$duf(important);
-    assert(resource.content.match(/debugger/));
+    du.$duf(this.important);
+    assert(this.resource.content.match(/debugger/));
   });
 
   it('should remove debugger statement', function() {
-    var id = important.__$duuid;
-    important = eval(resource.content);
-    important.__$duuid = id;
-    du.$dufr(important);
-    assert(!resource.content.match(/debugger/));
+    du.$duf(this.important);
+    var id = this.important.__$duuid;
+    this.important = eval(this.resource.content);
+    this.important.__$duuid = id;
+    du.$dufr(this.important);
+    assert(!this.resource.content.match(/debugger/));
   });
 
   it('should add log statements', function () {
-    important = eval(resource.content);
-    du.$dufl(important);
-    assert(resource.content.match(/console.log\(arguments\)/));
+    du.$dufl(this.important);
+    assert(this.resource.content.match(/console.log\(arguments\)/));
   });
 
   it('should handle conflicts between log and debug');
