@@ -8,16 +8,15 @@ var exports = {
   $duv: $duv,
   $duvl: $duvl,
   $duvr: $duvr,
-  $duf: $duf,
-  $dufl: $dufl,
-  $dufr: $dufr,
   $dum: $dum,
   $duml: $duml,
   $dumr: $dumr,
   $dug: $dug,
   $dugl: $dugl,
+  $dugr: $dugr,
   $dus: $dus,
   $dusl: $dusl,
+  $dusr: $dusr,
   $dugs: $dugs,
   $dugsl: $dugsl,
   $dugsr: $dugsr,
@@ -25,6 +24,11 @@ var exports = {
 
 if (typeof module === 'object' && typeof exports === 'object') {
   module.exports = exports;
+} else if (typeof console === 'object' && console._commandLineAPI) {
+  var proto = console._commandLineAPI.__proto__;
+  for (var prop in exports) {
+    proto[prop] = exports[prop];
+  }
 } else {
   this.debugUtils = exports;
 }
@@ -74,7 +78,10 @@ function debugEvent(object, event, isLog) {
 
   if (isLog) {
     handler = function() {
-      console.log('Event %s fired on %s with args', arguments);
+      console.log(
+        'Event %s fired on object %O with arguments',
+        event, object, arguments
+      );
     };
   } else {
     handler = function() {
@@ -144,162 +151,6 @@ function $duvr(object, event) {
     );
   });
 }
-
-/**
- *
- * Function debugging
- * ------------------
- *
- */
-
-function genInjection(fn, injectedCode) {
-  var id = uid();
-  Object.defineProperty(fn, '__$duuid', {
-    value: id,
-    configurable: false,
-    enumerable: false,
-    writable: false
-  });
-  return '\n// ' + id + '\n' + injectedCode;
-}
-
-function removeDebuggerStatement(sourceFile, fnSource, fn) {
-  assert(fn.__$duuid, 'Function was not debugged by $duf()');
-  var id = fn.__$duuid;
-  var source = getSource(fn);
-  var lines = source.split('\n');
-  assert(
-    lines[1] === '// ' + id, 'Cannot find my debugger statement.'
-  );
-  assert(
-    lines[2] === 'debugger;' ||
-      lines[2] === 'console.log(arguments);',
-    'Cannot find my debugger statement.'
-  );
-  lines.splice(1, 2);
-  modified = lines.join('\n');
-  sourceFile.setContent(
-    sourceFile.getContent().replace(fnSource, modified),
-    function(status) {
-      assert(
-        status.code === 'OK',
-        'Error updating source code for file ' + sourceFile.url
-      );
-      console.log('Debugger statement removed succesfully');
-    }
-  )
-}
-
-function injectStatement(sourceFile, fnSource, fn, injectedCode) {
-  var m = fnSource.match(/^function\s+[^\(]*\([^\)]*\)\s*\{/);
-  if (!m) throw new Error('Error parsing function source.');
-  var len = m[0].length;
-  var modified =
-    fnSource.substr(0, len) +
-    genInjection(fn, injectedCode) +
-    fnSource.substr(len);
-  sourceFile.setContent(
-    sourceFile.getContent().replace(fnSource, modified),
-    function(status) {
-      assert(
-        status.code === 'OK',
-        'Error updating source code for file ' + sourceFile.url
-      );
-      console.log('Debug statement added succesfully');
-    }
-  );
-}
-
-function addLogStatement(sourceFile, fnSource, fn) {
-  injectStatement(sourceFile, fnSource, fn, 'console.log(arguments);');
-}
-
-function addDebuggerStatment(sourceFile, fnSource, fn) {
-  injectStatement(sourceFile, fnSource, fn, 'debugger;');
-}
-
-function getSource(ref) {
-  assert(typeof ref === 'function', ref + ' is not a function.');
-
-  var source = ref.toString();
-
-  if (source.match('\[native\scode]\s\}$')) {
-    throw new Error('Can\'t step debug native code, try $dum()');
-  }
-
-  return source;
-}
-
-function getResourceFor(source, url, callback) {
-  chrome.devtools.inspectedWindow.getResources(function(resources) {
-    var sourceFiles = resources.filter(function(res) {
-      if (url && res.url.indexOf(url) === -1) {
-        return false;
-      } else {
-        return res.getContent().indexOf(source) !== -1
-      }
-    });
-    var sourceFile = sourceFiles[0];
-    if (!sourceFiles.length) {
-      throw new Error('Function not found in loaded resources.');
-    } else if (sourceFiles.length > 1) {
-      console.warn(
-        'Found more than source file with the same function',
-        'Try supplying a resource url or using $dum()'
-      );
-    }
-    callback && callback(sourceFile);
-  });
-}
-
-/**
- * Adds a debugger statement to a function reference.
- *
- * @param {function} ref
- * @param {string} url
- * @public
- */
-
-function $duf(ref, url) {
-  var source = getSource(ref);
-
-  getResourceFor(source, url, function(resource) {
-    addDebuggerStatment(resource, source, ref);
-  });
-}
-
-/**
- * Adds a logger statement to a function reference.
- *
- * @param {function} ref
- * @param {string} url
- * @public
- */
-
-function $dufl(ref, url) {
-  var source = getSource(ref);
-
-  getResourceFor(source, url, function(resource) {
-    addLogStatement(resource, source, ref);
-  });
-}
-
-/**
- * Removes previously set debugger/logger statement to a function reference.
- *
- * @param {function} ref
- * @param {string} url
- * @public
- */
-
-function $dufr(ref, url) {
-  var source = getSource(ref);
-
-  getResourceFor(source, url, function (resource) {
-    removeDebuggerStatement(resource, source, ref);
-  });
-}
-
 
 /**
  *
@@ -402,13 +253,13 @@ function debugAccessor(object, prop, options) {
   if (options.log) {
     if (options.getter) {
       newDesc.get = function() {
-        console.log('About to get value from property', prop);
+        console.log('About to get property %s from object %O', prop, object);
         return val;
       };
     }
     if (options.setter) {
       newDesc.set = function(v) {
-        console.log('About to set value on property', prop);
+        console.log('About to set property %s from object %O', prop, object);
         return val = v;
       };
     }

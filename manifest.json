@@ -1,10 +1,7 @@
 {
   "name": "Debug Utils",
   "version": "0.1",
-  "description": "HotSwap JavaScript code",
+  "description": "Extra command line api goodness",
   "devtools_page": "devtools.html",
-  "manifest_version": 2,
-  "permissions": [
-    "debugger",
-  ]
+  "manifest_version": 2
 }

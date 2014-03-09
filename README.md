@@ -17,20 +17,6 @@ Attach an event handler that logs its arguments when fired.
 
 Remove previously set debug event handler.
 
-### $duf(function ref)
-
-Set a breakpoint on the first line of the function referenced. Works by
-searching through the source for the function, so it won't work if you have
-multiple functions with the _exact_ same source. See `$dum` to debug a method.
-
-### $dufl(function ref)
-
-Logs the arguments passed to the function.
-
-### $dufr(function ref)
-
-Removes previosly set debugger or log statement.
-
 ### $dum(object, method)
 
 Wraps an object's method with a wrapper function with a debugger statement so
