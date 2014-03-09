@@ -1,7 +1,7 @@
 (function() {
 
 /**
- * Export for testing.
+ * Export API.
  */
 
 var exports = {
@@ -23,13 +23,16 @@ var exports = {
 };
 
 if (typeof module === 'object' && typeof exports === 'object') {
+  // Node.js mostly for testing.
   module.exports = exports;
 } else if (typeof console === 'object' && console._commandLineAPI) {
+  // Chrome.
   var proto = console._commandLineAPI.__proto__;
   for (var prop in exports) {
     proto[prop] = exports[prop];
   }
 } else {
+  // Window global.
   this.debugUtils = exports;
 }
 
