@@ -3,8 +3,6 @@ Debug Utils
 
 Useful JavaScript debug utilities.
 
-_Currently works well in chrome but will bring this to more browsers soon._
-
 ## Install
 
 ### Chrome extension
@@ -146,3 +144,8 @@ Like `$dum` but logs arguments instead.
 ### $dumr(object, method)
 
 Removes debug or log wrappers added by `$dum` or `$duml`.
+
+## License
+
+MIT  
+Copyright (c) 2014 Amjad Masad <amjad.masad@gmail.com>
