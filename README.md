@@ -3,7 +3,45 @@ Debug Utils
 
 Useful JavaScript debug utilities.
 
-__Currently works well in chrome but will bring this to more browsers soon.__
+_Currently works well in chrome but will bring this to more browsers soon._
+
+## Install
+
+### Chrome extension
+
+The easiest way to install is to grab the [chrome extension]() which all add the
+functions to your command Line API (only accessible via console).
+
+### Script
+
+Grab `du.js` and add it in script tag on your page, which will make all the
+the functions accessible from anywhere in your code.
+
+### Node.js
+
+I haven't put much consideration into how will this work in node but I use it
+for running the tests so it should probably work.
+
+```
+$ npm install debug_utils
+```
+
+```js
+var du = require('debug_utils');
+du.$duv(object, 'foo');
+```
+
+## Naming
+
+I tried to name the funcitons in a way they're memorable and easy to type here
+are the rules that I followd for naming:
+
+* All functions start with `$du` to avoid conflicts.
+* Somewhat pronounceable to enable profits via word-of-mouth marketing.
+* After `$du` there comes a single letter to hint at the functionality we are
+debugging. e.g. `$duv`, v for events.
+* `r` at the end of the function name means 'remove'.
+
 
 ## Event Debugging
 
