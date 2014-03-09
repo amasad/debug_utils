@@ -62,9 +62,9 @@ describe('$duf, $dufr', function() {
         cb({code: 'OK'})
       }
     }
-    var chromeAPI = {};
-    chromeAPI.getResources = function(cb) {cb([resource])};
-    global.chromeAPI = chromeAPI;
+    chrome = { devtools: { inspectedWindow: {
+      getResources: function(cb) {cb([resource])}
+    }}};
   });
 
   it('should add a debugger statement to function source', function() {
@@ -121,4 +121,55 @@ describe('$dum, $duml, $dumr', function() {
 
   it('should handle exit wrapping for already wrapped functions');
 
+});
+
+describe('$dug, $dugl, $dugr, $dus, $dusl, $dusr', function() {
+
+  beforeEach(function() {
+    this.obj = {
+      foo: 1
+    };
+  });
+
+  it('add a logger proxy to the getter', function(done) {
+    du.$dugl(this.obj, 'foo');
+    var _log = console.log;
+    console.log = function(a, b) {
+      console.log = _log;
+      assert.equal(b, 'foo');
+      done();
+    };
+    assert.equal(this.obj.foo, 1);
+  });
+
+  it('add a logger proxy to the setter', function(done) {
+    du.$dusl(this.obj, 'foo');
+    var _log = console.log;
+    var obj = this.obj;
+    console.log = function() {
+      console.log = _log;
+      setTimeout(function() {
+        assert.equal(obj.foo, 2);
+        done();
+      });
+    };
+    this.obj.foo = 2;
+  });
+
+  it('remove setter', function(done) {
+    du.$dusl(this.obj, 'foo');
+    var _log = console.log;
+    var obj = this.obj;
+    var i = 0;
+    console.log = function() {
+      if (++i > 1) done(new Error());
+    };
+    this.obj.foo = 5;
+    setTimeout(function() {
+      console.log = _log;
+      assert.equal(obj.foo, 5);
+      assert.equal(i, 1);
+      done();
+    });
+  });
 });

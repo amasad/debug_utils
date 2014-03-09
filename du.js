@@ -1,19 +1,32 @@
+(function() {
+
 /**
  * Export for testing.
  */
 
+var exports = {
+  $duv: $duv,
+  $duvl: $duvl,
+  $duvr: $duvr,
+  $duf: $duf,
+  $dufl: $dufl,
+  $dufr: $dufr,
+  $dum: $dum,
+  $duml: $duml,
+  $dumr: $dumr,
+  $dug: $dug,
+  $dugl: $dugl,
+  $dus: $dus,
+  $dusl: $dusl,
+  $dugs: $dugs,
+  $dugsl: $dugsl,
+  $dugsr: $dugsr,
+};
+
 if (typeof module === 'object' && typeof exports === 'object') {
-  module.exports = {
-    $duv: $duv,
-    $duvl: $duvl,
-    $duvr: $duvr,
-    $duf: $duf,
-    $dufl: $dufl,
-    $dufr: $dufr,
-    $dum: $dum,
-    $duml: $duml,
-    $dumr: $dumr
-  };
+  module.exports = exports;
+} else {
+  this.debugUtils = exports;
 }
 
 /**
@@ -218,7 +231,7 @@ function getSource(ref) {
 }
 
 function getResourceFor(source, url, callback) {
-  chromeAPI.getResources(function(resources) {
+  chrome.devtools.inspectedWindow.getResources(function(resources) {
     var sourceFiles = resources.filter(function(res) {
       if (url && res.url.indexOf(url) === -1) {
         return false;
@@ -350,6 +363,129 @@ function $dumr(object, method) {
 }
 
 /**
+ *
+ * Getters and setters debugging
+ * -----------------------------
+ *
+ */
+
+var descriptors = [];
+
+function debugAccessor(object, prop, options) {
+  var desc = Object.getOwnPropertyDescriptor(object, prop);
+
+  if (desc.get || desc.set) {
+    throw new Error(
+      '$dug doesn\'t currently support properties with accessors.'
+    );
+  }
+
+  var val = desc.value;
+
+  descriptors.push({
+    object: object,
+    desc: desc,
+    getVal: function() { return val }
+  });
+
+  var newDesc = {
+    configurable: false,
+    enumerable: desc.enumerable,
+    set: function(v) {
+      return val = v;
+    },
+    get: function() {
+      return val;
+    }
+  };
+
+  if (options.log) {
+    if (options.getter) {
+      newDesc.get = function() {
+        console.log('About to get value from property', prop);
+        return val;
+      };
+    }
+    if (options.setter) {
+      newDesc.set = function(v) {
+        console.log('About to set value on property', prop);
+        return val = v;
+      };
+    }
+  } else {
+    if (options.getter) {
+      newDesc.get = function() {
+        debugger;
+        return val;
+      };
+    }
+    if (options.setter) {
+      newDesc.set = function(v) {
+        debugger;
+        return val = v;
+      };
+    }
+  }
+
+  Object.defineProperty(object, prop, newDesc);
+}
+
+function removeAccessors(object, prop) {
+  for (var i = 0; i < descriptors.length; i++) {
+    var item = descriptors[i];
+    if (item.object === object) {
+      item.desc.val = item.getVal();
+      object.defineProperty(object, prop, item.desc);
+      return true;
+    }
+  }
+  return false;
+}
+
+function $dug(object, prop) {
+  return debugAccessor(object, prop, { getter: true });
+}
+
+function $dugl(object, prop) {
+  return debugAccessor(object, prop, { getter: true, log: true });
+}
+
+function $dugr(object, prop) {
+  return removeAccessors(object, prop);
+}
+
+function $dus(object, prop) {
+  return debugAccessor(object, prop, { setter: true });
+}
+
+function $dusl(object, prop) {
+  return debugAccessor(object, prop, { setter: true, log: true});
+}
+
+function $dusr(object, prop) {
+  return removeAccessors(object, prop);
+}
+
+function $dugs(object, prop) {
+  return debugAccessor(object, prop, {
+    setter: true,
+    getter: true
+  });
+}
+
+function $dugsl(object, prop) {
+  return debugAccessor(object, prop, {
+    setter: true,
+    getter: true,
+    log: true
+  });
+}
+
+function $dugsr(object, prop) {
+  return removeAccessors(object, prop);
+}
+
+/**
  * Utils.
  */
 
@@ -373,3 +509,5 @@ function uid(len) {
   len = len || 7;
   return Math.random().toString(35).substr(2, len);
 }
+
+}).call(this);
