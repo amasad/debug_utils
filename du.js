@@ -160,6 +160,15 @@ function $duvr(object, event) {
 
 var wrappedMethods = [];
 
+/**
+ * Wraps a method with a debugger or logger statement.
+ *
+ * @param {object} object
+ * @param {string} methodName
+ * @param {boolean} isLog
+ * @private
+ */
+
 function wrapMethod(object, methodName, isLog) {
   assert(
     typeof object === 'object' &&
@@ -192,13 +201,37 @@ function wrapMethod(object, methodName, isLog) {
   object[methodName] = replacement;
 }
 
+/**
+ * Wraps a method with a debugger statement.
+ *
+ * @param {object} object
+ * @param {string} methodName
+ * @public
+ */
+
 function $dum(object, method) {
   wrapMethod(object, method);
 }
 
+/**
+ * Wraps a method with a logger statement.
+ *
+ * @param {object} object
+ * @param {string} methodName
+ * @public
+ */
+
 function $duml(object, method) {
   wrapMethod(object, method, true);
 }
+
+/**
+ * Removes method wrapping.
+ *
+ * @param {object} object
+ * @param {string} methodName
+ * @public
+ */
 
 function $dumr(object, method) {
   var item = spliceOutItem(wrappedMethods, object);
@@ -215,6 +248,15 @@ function $dumr(object, method) {
  */
 
 var descriptors = [];
+
+/**
+ * Adds debug/log accessors to object properties.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @param {object} options
+ * @private
+ */
 
 function debugAccessor(object, prop, options) {
   var desc = Object.getOwnPropertyDescriptor(object, prop);
@@ -275,6 +317,14 @@ function debugAccessor(object, prop, options) {
   Object.defineProperty(object, prop, newDesc);
 }
 
+/**
+ * Removes debug/log accessors to object properties.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @private
+ */
+
 function removeAccessors(object, prop) {
   var item = spliceOutItem(descriptors, object);
   if (!item) return false;
@@ -283,29 +333,85 @@ function removeAccessors(object, prop) {
   return true;
 }
 
+/**
+ * Adds debug getter to `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
+
 function $dug(object, prop) {
   return debugAccessor(object, prop, { getter: true });
 }
+
+/**
+ * Adds log getter to `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
 
 function $dugl(object, prop) {
   return debugAccessor(object, prop, { getter: true, log: true });
 }
 
+/**
+ * Removes debug/log getter from `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
+
 function $dugr(object, prop) {
   return removeAccessors(object, prop);
 }
+
+/**
+ * Adds debug setter from `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
 
 function $dus(object, prop) {
   return debugAccessor(object, prop, { setter: true });
 }
 
+/**
+ * Adds log setter from `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
+
 function $dusl(object, prop) {
   return debugAccessor(object, prop, { setter: true, log: true});
 }
 
+/**
+ * Removes debug/logger setter from `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
+
 function $dusr(object, prop) {
   return removeAccessors(object, prop);
 }
+
+/**
+ * Adds debug getter and setter to `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
 
 function $dugs(object, prop) {
   return debugAccessor(object, prop, {
@@ -313,6 +419,14 @@ function $dugs(object, prop) {
     getter: true
   });
 }
+
+/**
+ * Adds log getter and setter to `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
 
 function $dugsl(object, prop) {
   return debugAccessor(object, prop, {
@@ -322,6 +436,14 @@ function $dugsl(object, prop) {
   });
 }
 
+/**
+ * Removes debug/log getter and setter from `object` property `prop`.
+ *
+ * @param {object} object
+ * @param {string} prop
+ * @public
+ */
+
 function $dugsr(object, prop) {
   return removeAccessors(object, prop);
 }
@@ -330,9 +452,28 @@ function $dugsr(object, prop) {
  * Utils.
  */
 
+/**
+ * Throw if `conditiont` is not truthy.
+ *
+ * @param {*} condition
+ * @param {string} message
+ * @private
+ */
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
+
+/**
+ * Applies the first method that exists on `object` from `methods`. Otherwise
+ * throws with `message`.
+ *
+ * @param {object} object
+ * @param {array<string>} methods
+ * @param {array<*>} args
+ * @param {string} message
+ * @private
+ */
 
 function applyOne(object, methods, args, message) {
   for (var i = 0; i < methods.length; i++) {
@@ -346,10 +487,27 @@ function applyOne(object, methods, args, message) {
   }
 }
 
+/**
+ * Alphanumeric Unique id of `len` length.
+ *
+ * @param {number} len
+ * @private
+ */
+
 function uid(len) {
   len = len || 7;
   return Math.random().toString(35).substr(2, len);
 }
+
+/**
+ * Given a list `items`, find the item with the property 'object' that matches
+ * `object, splice it out and return it.
+ *
+ * @param {array<object>} items
+ * @param {object} object
+ * @return {object|undefined}
+ * @private
+ */
 
 function spliceOutItem(items, object) {
   for (var i = 0; i < items.length; i++) {
