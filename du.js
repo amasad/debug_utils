@@ -56,7 +56,7 @@ var removeListenerMethods = [
 var dontKnowHowToListenMsg = 'Don\'t how to listen to your object, please ' +
   'open an issue if you think we should be able to.';
 
-var listeners = {};
+var listeners = [];
 
 /**
  * Adds a debugger or logger `event` handler to `object.
@@ -96,8 +96,8 @@ function debugEvent(object, event, isLog) {
     dontKnowHowToListenMsg
   );
 
-  if (!listeners[event]) listeners[event] = [];
-  listeners[event].push({
+  listeners.push({
+    event: event,
     object: object,
     handler: handler
   });
@@ -140,16 +140,15 @@ function $duvl(object, event) {
  */
 
 function $duvr(object, event) {
-  listeners[event].filter(function(desc) {
-    return desc.object === object;
-  }).forEach(function(desc) {
-    applyOne(
-      object,
-      removeListenerMethods,
-      [event, desc.handler],
-      dontKnowHowToListenMsg
-    );
-  });
+  var item = spliceOutItem(listeners, object);
+  if (!item) return false;
+  applyOne(
+    object,
+    removeListenerMethods,
+    [event, item.handler],
+    dontKnowHowToListenMsg
+  );
+  return true;
 }
 
 /**
@@ -202,15 +201,10 @@ function $duml(object, method) {
 }
 
 function $dumr(object, method) {
-  for (var i = 0; i < wrappedMethods.length; i++) {
-    var item = wrappedMethods[i];
-    if (item.object === object) {
-      object[method] = item.method;
-      wrappedMethods.splice(i, 1);
-      return true;
-    }
-  }
-  return false;
+  var item = spliceOutItem(wrappedMethods, object);
+  if (!item) return false;
+  object[method] = item.method;
+  return true;
 }
 
 /**
@@ -282,15 +276,11 @@ function debugAccessor(object, prop, options) {
 }
 
 function removeAccessors(object, prop) {
-  for (var i = 0; i < descriptors.length; i++) {
-    var item = descriptors[i];
-    if (item.object === object) {
-      item.desc.val = item.getVal();
-      object.defineProperty(object, prop, item.desc);
-      return true;
-    }
-  }
-  return false;
+  var item = spliceOutItem(descriptors, object);
+  if (!item) return false;
+  item.desc.val = item.getVal();
+  object.defineProperty(object, prop, item.desc);
+  return true;
 }
 
 function $dug(object, prop) {
@@ -359,6 +349,16 @@ function applyOne(object, methods, args, message) {
 function uid(len) {
   len = len || 7;
   return Math.random().toString(35).substr(2, len);
+}
+
+function spliceOutItem(items, object) {
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    if (item.object === object) {
+      items.splice(i, 1);
+      return item;
+    }
+  }
 }
 
 }).call(this);
