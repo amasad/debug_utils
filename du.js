@@ -192,12 +192,12 @@ function wrapMethod(object, methodName, isLog) {
   if (isLog) {
     replacement = function() {
       console.log(arguments);
-      return method.apply(object, slice.call(arguments));
+      return method.apply(this, slice.call(arguments));
     };
   } else {
     replacement = function() {
       debugger;
-      return method.apply(object, slice.call(arguments));
+      return method.apply(this, slice.call(arguments));
     };
   }
 
