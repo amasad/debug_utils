@@ -1,3 +1,10 @@
+/**
+ *
+ * Event debugging
+ * ---------------
+ *
+ */
+
 var listenMethods = [
   'addEventListener',
   'addListener',
@@ -15,6 +22,16 @@ var dontKnowHowToListenMsg = 'Don\'t how to listen to your object, please ' +
   'open an issue if you think we should be able to.';
 
 var listeners = {};
+
+/**
+ * Adds a debugger or logger `event` handler to `object.
+ *
+ * @param {object} object
+ * @param {string} event
+ * @param {boolean} isLog
+ * @private
+ * @return {*} Whatever is returned from the event listener method.
+ */
 
 function debugEvent(object, event, isLog) {
   assert(
@@ -50,13 +67,39 @@ function debugEvent(object, event, isLog) {
   return ret;
 }
 
+/**
+ * Adds a debugger `event` handler to `object
+ *
+ * @param {object} object
+ * @param {string} event
+ * @public
+ * @return {*} Whatever is returned from the event listener method.
+ */
+
 function $duv(object, event) {
   return debugEvent(object, event, false);
 }
 
+/**
+ * Adds a logger `event` handler to `object
+ *
+ * @param {object} object
+ * @param {string} event
+ * @public
+ * @return {*} Whatever is returned from the event listener method.
+ */
+
 function $duvl(object, event) {
   return debugEvent(object, event, true);
 }
+
+/**
+ * Removes previously set `event` handler by `$duv` or `$duvl` from `object`.
+ *
+ * @param {object} object
+ * @param {string} event
+ * @public
+ */
 
 function $duvr(object, event) {
   listeners[event].filter(function(desc) {
@@ -70,6 +113,13 @@ function $duvr(object, event) {
     );
   });
 }
+
+/**
+ *
+ * Function debugging
+ * ------------------
+ *
+ */
 
 function genInjection(fn, injectedCode) {
   var id = uid();
@@ -171,6 +221,14 @@ function getResourceFor(source, url, callback) {
   });
 }
 
+/**
+ * Adds a debugger statement to a function reference.
+ *
+ * @param {function} ref
+ * @param {string} url
+ * @public
+ */
+
 function $duf(ref, url) {
   var source = getSource(ref);
 
@@ -179,6 +237,14 @@ function $duf(ref, url) {
   });
 }
 
+/**
+ * Adds a logger statement to a function reference.
+ *
+ * @param {function} ref
+ * @param {string} url
+ * @public
+ */
+
 function $dufl(ref, url) {
   var source = getSource(ref);
 
@@ -186,6 +252,14 @@ function $dufl(ref, url) {
     addLogStatement(resource, source, ref);
   });
 }
+
+/**
+ * Removes previously set debugger/logger statement to a function reference.
+ *
+ * @param {function} ref
+ * @param {string} url
+ * @public
+ */
 
 function $dufr(ref, url) {
   var source = getSource(ref);
