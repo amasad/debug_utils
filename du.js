@@ -25,15 +25,17 @@ var exports = {
 if (typeof module === 'object' && typeof exports === 'object') {
   // Node.js mostly for testing.
   module.exports = exports;
-} else if (typeof console === 'object' && console._commandLineAPI) {
-  // Chrome.
-  var proto = console._commandLineAPI.__proto__;
-  for (var prop in exports) {
-    proto[prop] = exports[prop];
-  }
 } else {
   // Window global.
   this.debugUtils = exports;
+  if (typeof console === 'object' && console._commandLineAPI &&
+      console._commandLineAPI.__proto__) {
+    // Chrome.
+    var proto = console._commandLineAPI.__proto__;
+    for (var prop in exports) {
+      proto[prop] = exports[prop];
+    }
+  }
 }
 
 /**
