@@ -7,8 +7,8 @@ Useful JavaScript debug utilities.
 
 ### Chrome extension
 
-The easiest way to install is to grab the [chrome extension](https://chrome.google.com/webstore/detail/djailkkojeahmihdpcelmmobkpepmkcl) which all add the
-functions to your command Line API (only accessible via console).
+The easiest way to install is to grab the [chrome extension](https://chrome.google.com/webstore/detail/djailkkojeahmihdpcelmmobkpepmkcl) which will add the
+utility functions to your command Line API (only accessible via the console).
 
 ### Script
 
