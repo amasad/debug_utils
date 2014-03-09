@@ -364,8 +364,8 @@ function $dumr(object, method) {
 
 /**
  *
- * Getters and setters debugging
- * -----------------------------
+ * Accessor debugging
+ * ------------------
  *
  */
 
