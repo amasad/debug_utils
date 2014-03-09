@@ -1,0 +1,25 @@
+{
+  "name": "debug_utils",
+  "version": "0.0.1",
+  "description": "Useful utilities library for command-line JavaScript debugging ",
+  "main": "du.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha ./test --bail"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amasad/debug_utils.git"
+  },
+  "keywords": [
+    "debug",
+    "utility"
+  ],
+  "author": "amasad",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amasad/debug_utils/issues"
+  }
+}
