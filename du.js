@@ -58,7 +58,7 @@ var removeListenerMethods = [
   'off'
 ];
 
-var dontKnowHowToListenMsg = 'Don\'t how to listen to your object, please ' +
+var dontKnowHowToListenMsg = 'Don\'t know how to listen to your object, please ' +
   'open an issue if you think we should be able to.';
 
 var listeners = [];
