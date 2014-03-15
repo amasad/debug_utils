@@ -13,7 +13,9 @@ utility functions (described below) to your JavaScript console.
 ### Script
 
 Grab `du.js` and add it in script tag on your page, which will make all the
-the functions (described below) available under the `window.debugUtils` namespace.
+the functions (described below) available under the `window.debugUtils`
+namespace. To import the functions to the global namespace simply call
+`debugUtils.global()`.
 
 ### Node.js
 
@@ -27,6 +29,9 @@ $ npm install debug_utils
 ```js
 var du = require('debug_utils');
 du.$duv(object, 'foo');
+// Make the functions available globally.
+du.global();
+$duv(object, 'bar');
 ```
 
 ## Naming

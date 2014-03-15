@@ -2,6 +2,15 @@ var du = require('../du');
 var assert = require('assert');
 var EventEmitter = require('events').EventEmitter;
 
+describe('global', function() {
+
+  it('should install all the functions on the global NS', function() {
+    du.global();
+    assert(global.$duv && global.$dum && global.$dus);
+  });
+
+});
+
 describe('$duv, $duvl, $duvr', function() {
 
   it('should attach a debug event listener', function() {

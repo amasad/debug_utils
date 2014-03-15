@@ -20,21 +20,19 @@ var exports = {
   $dugs: $dugs,
   $dugsl: $dugsl,
   $dugsr: $dugsr,
+  global: install.bind(null, this)
 };
 
 if (typeof module === 'object' && typeof exports === 'object') {
   // Node.js mostly for testing.
   module.exports = exports;
 } else {
-  // Window global.
+  // Global.
   this.debugUtils = exports;
   if (typeof console === 'object' && console._commandLineAPI &&
       console._commandLineAPI.__proto__) {
-    // Chrome.
-    var proto = console._commandLineAPI.__proto__;
-    for (var prop in exports) {
-      proto[prop] = exports[prop];
-    }
+    // Chrome console.
+    install(console._commandLineAPI.__proto__);
   }
 }
 
@@ -524,4 +522,17 @@ function spliceOutItem(items, object) {
   }
 }
 
-}).call(this);
+/**
+ * Install debug utils functions on a receiver object.
+ *
+ * @param {object} receiver
+ * @private
+ */
+
+function install(receiver) {
+  for (var prop in exports) {
+    if (prop.match(/^\$/)) receiver[prop] = exports[prop];
+  }
+}
+
+}).call(Function('return this')());
