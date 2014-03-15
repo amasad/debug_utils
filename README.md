@@ -1,7 +1,7 @@
-Debug Utils
+Debug Utils ![](http://i.imgur.com/C4GDJ9O.png)
 -----------
 
-Useful JavaScript debug utilities.
+JavaScript debugging utility library.
 
 ## Install
 
