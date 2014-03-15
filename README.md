@@ -8,12 +8,12 @@ Useful JavaScript debug utilities.
 ### Chrome extension
 
 The easiest way to install is to grab the [chrome extension](https://chrome.google.com/webstore/detail/djailkkojeahmihdpcelmmobkpepmkcl) which will add the
-utility functions to your command Line API (only accessible via the console).
+utility functions (described below) to your JavaScript console.
 
 ### Script
 
 Grab `du.js` and add it in script tag on your page, which will make all the
-the functions accessible from anywhere in your code.
+the functions (described below) available under the `window.debugUtils` namespace.
 
 ### Node.js
 
@@ -31,13 +31,14 @@ du.$duv(object, 'foo');
 
 ## Naming
 
-I tried to name the funcitons in a way they're memorable and easy to type here
-are the rules that I followd for naming:
+I tried to name the functions so that they're memorable and easy to type. Here
+are the rules that I followed for naming:
 
 * All functions start with `$du` to avoid conflicts.
 * Somewhat pronounceable to enable profits via word-of-mouth marketing.
 * After `$du` there comes a single letter to hint at the functionality we are
 debugging. e.g. `$duv`, v for events.
+* `l` at the end of the function means 'log'. e.g. `$duvl`, log events.
 * `r` at the end of the function name means 'remove'.
 
 
