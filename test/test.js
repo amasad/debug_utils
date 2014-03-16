@@ -83,45 +83,88 @@ describe('$dug, $dugl, $dugr, $dus, $dusl, $dusr', function() {
     };
   });
 
+  afterEach(function() {
+    restoreLog();
+  });
+
   it('add a logger proxy to the getter', function(done) {
     du.$dugl(this.obj, 'foo');
     var _log = console.log;
-    console.log = function(a, b) {
-      console.log = _log;
+    replaceLog(function(a, b) {
       assert.equal(b, 'foo');
       done();
-    };
+    });
     assert.equal(this.obj.foo, 1);
   });
 
   it('add a logger proxy to the setter', function(done) {
     du.$dusl(this.obj, 'foo');
-    var _log = console.log;
     var obj = this.obj;
-    console.log = function() {
-      console.log = _log;
+    replaceLog(function() {
       setTimeout(function() {
         assert.equal(obj.foo, 2);
         done();
       });
-    };
+    });
     this.obj.foo = 2;
   });
 
   it('remove setter', function(done) {
     du.$dusl(this.obj, 'foo');
-    var _log = console.log;
     var obj = this.obj;
     var i = 0;
-    console.log = function() {
+    replaceLog(function() {
       if (++i > 1) done(new Error());
-    };
+    });
     this.obj.foo = 5;
+    du.$dusr(this.obj, 'foo');
     setTimeout(function() {
-      console.log = _log;
       assert.equal(obj.foo, 5);
       assert.equal(i, 1);
       done();
     });
   });
+
+  it('should work on property with getter', function(done) {
+    var o = {};
+    Object.defineProperty(o, 'foo', {
+      configurable: true,
+      get: function() {
+        return 'foo boo';
+      }
+    });
+    du.$dugl(o, 'foo');
+    replaceLog(function() {
+      done();
+    });
+    assert.equal(o.foo, 'foo boo');
+  });
+
+  it('should work on property with setter', function(done) {
+    var called = false;
+    var o = {};
+    Object.defineProperty(o, 'foo', {
+      configurable: true,
+      get: function() {return 2;},
+      set: function(v) {
+        assert.equal(v, 1);
+        assert(called, 'log must be called');
+        done();
+      }
+    });
+    du.$dusl(o, 'foo');
+    replaceLog(function() {
+      called = true;
+    });
+    o.foo = 1;
+  });
+
 });
+
+var _log = console.log;
+function replaceLog(fn) {
+  console.log = fn;
+}
+function restoreLog() {
+  console.log = _log;
+}

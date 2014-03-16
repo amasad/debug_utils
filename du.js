@@ -267,12 +267,6 @@ var descriptors = [];
 function debugAccessor(object, prop, options) {
   var desc = Object.getOwnPropertyDescriptor(object, prop);
 
-  if (desc.get || desc.set) {
-    throw new Error(
-      '$dug doesn\'t currently support properties with accessors.'
-    );
-  }
-
   var val = desc.value;
 
   descriptors.push({
@@ -282,45 +276,71 @@ function debugAccessor(object, prop, options) {
   });
 
   var newDesc = {
-    configurable: false,
+    configurable: true,
     enumerable: desc.enumerable,
     set: function(v) {
-      return val = v;
+      return set.call(this, v);
     },
     get: function() {
-      return val;
+      return get.call(this);
     }
   };
 
   if (options.log) {
     if (options.getter) {
       newDesc.get = function() {
-        console.log('About to get property %s from object %O', prop, object);
-        return val;
+        console.log(
+          'About to get property %s from object %O with value %O',
+          prop,
+          object,
+          val
+        );
+        return get.call(this);
       };
     }
     if (options.setter) {
       newDesc.set = function(v) {
-        console.log('About to set property %s from object %O', prop, object);
-        return val = v;
+        console.log(
+          'About to set property %s from object %O to value %O',
+          prop,
+          object,
+          v
+        );
+        return set.call(this, v);
       };
     }
   } else {
     if (options.getter) {
       newDesc.get = function() {
         debugger;
-        return val;
+        return get.call(this);
       };
     }
     if (options.setter) {
       newDesc.set = function(v) {
         debugger;
-        return val = v;
+        return set.call(this, v);
       };
     }
   }
 
   Object.defineProperty(object, prop, newDesc);
+
+  function set(v) {
+    if (desc.set) {
+      return desc.set.call(this, v);
+    } else {
+      return val = v;
+    }
+  }
+
+  function get() {
+    if (desc.get) {
+      return desc.get.call(this);
+    } else {
+      return val;
+    }
+  }
 }
 
 /**
@@ -334,8 +354,8 @@ function debugAccessor(object, prop, options) {
 function removeAccessors(object, prop) {
   var item = spliceOutItem(descriptors, object);
   if (!item) return false;
-  item.desc.val = item.getVal();
-  object.defineProperty(object, prop, item.desc);
+  if (!(item.desc.get || item.desc.set)) item.desc.value = item.getVal();
+  Object.defineProperty(object, prop, item.desc);
   return true;
 }
 
