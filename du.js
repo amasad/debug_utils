@@ -20,6 +20,9 @@ var exports = {
   $dugs: $dugs,
   $dugsl: $dugsl,
   $dugsr: $dugsr,
+  $dudebug: $dudebug,
+  $dulog: $dulog,
+  $dulogm: $dulogm,
   global: install.bind(null, this)
 };
 
@@ -449,6 +452,42 @@ function $dugsl(object, prop) {
 
 function $dugsr(object, prop) {
   return removeAccessors(object, prop);
+}
+
+/**
+ *
+ * Callbacks Debugging
+ * -------------------
+ *
+ */
+
+/**
+ * Break next time this function is called.
+ */
+
+function $dudebug() {
+  debugger;
+}
+
+/**
+ * Log arguments.
+ */
+
+function $dulog() {
+  console.log(arguments);
+}
+
+/**
+ * Log arguments prefixed with a custom message.
+ *
+ * @param {string} msg
+ * @return {function}
+ */
+
+function $dulogm(msg) {
+  return function() {
+    console.log(msg, arguments);
+  };
 }
 
 /**

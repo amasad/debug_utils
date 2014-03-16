@@ -151,6 +151,38 @@ Like `$dum` but logs arguments instead.
 
 Removes debug or log wrappers added by `$dum` or `$duml`.
 
+## Debugging Callbacks
+
+For APIs taking callbacks, it's really useful to be able to drop in a
+logger or a debugger statement. The following functions are shorter to type out:
+
+### $dudebug
+
+A function with a debugger statement.
+
+```js
+xhr.onreadystatechange = $dudebug;
+```
+
+Useful for:
+
+* Making sure callbacks are being called.
+* Breaking on callback.
+
+p.s. no pun intended.
+
+### $dulog
+
+Similar to `$dudebug` but logs it's arguments instead of breaking.
+
+### $dulogm(message)
+
+When called returns a function that logs it's arguments prefixed with `message`.
+
+```js
+xhr.onreadystatechange = $dulogm('xhr readystate change');
+```
+
 ## License
 
 MIT  
