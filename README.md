@@ -1,7 +1,12 @@
 Debug Utils ![](http://i.imgur.com/C4GDJ9O.png)
 -----------
 
-JavaScript debugging utility library.
+Log and break on:
+
+* Object property access
+* Custom JavaScript and DOM events
+* Method calls
+* Callbacks
 
 ## Install
 
