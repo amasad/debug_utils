@@ -1,12 +1,52 @@
+var fs = require('fs');
+var vm = require('vm');
 var du = require('../du');
 var assert = require('assert');
 var EventEmitter = require('events').EventEmitter;
 
-describe('global', function() {
+describe('install', function() {
+
+  beforeEach(function() {
+    this.consoleCalled = false;
+    this.sandbox = {
+      console: {
+        debug: function(){
+          this.consoleCalled = true;
+        }.bind(this)
+      }
+    };
+    this.run = function() {
+      this.context = vm.createContext(this.sandbox);
+      vm.runInContext(
+        fs.readFileSync(__dirname + '/../du.js'),
+        this.context,
+        'du.js'
+      );
+    }.bind(this);
+  });
 
   it('should install all the functions on the global NS', function() {
-    du.global();
-    assert(global.$duv && global.$dum && global.$dus);
+    this.run();
+    var context = this.context;
+    assert(context.$duv && context.$dum && context.$dus);
+  });
+
+  it('should handle conflicts', function() {
+    this.sandbox.$dum = 'foo';
+    this.run();
+    var context = this.context;
+    assert(context.$dum === 'foo', 'failed not replace $dum');
+    assert(!(context.$duv && context.$dus), 'failed not install');
+    assert(this.consoleCalled);
+  });
+
+  it('should force install when global is called', function() {
+    this.sandbox.$dum = 'foo';
+    this.run();
+    var context = this.context;
+    vm.runInContext('debugUtils.global()', context, 'force');
+    assert(context.$dum !== 'foo', 'failed to replace $dum');
+    assert(context.$duv && context.$dus, 'failed to install');
   });
 
 });

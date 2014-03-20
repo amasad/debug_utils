@@ -22,8 +22,7 @@ var exports = {
   $dugsr: $dugsr,
   $dudebug: $dudebug,
   $dulog: $dulog,
-  $dulogm: $dulogm,
-  global: install.bind(null, this)
+  $dulogm: $dulogm
 };
 
 if (typeof module === 'object' && typeof exports === 'object') {
@@ -31,12 +30,7 @@ if (typeof module === 'object' && typeof exports === 'object') {
   module.exports = exports;
 } else {
   // Global.
-  this.debugUtils = exports;
-  if (typeof console === 'object' && console._commandLineAPI &&
-      console._commandLineAPI.__proto__) {
-    // Chrome console.
-    install(console._commandLineAPI.__proto__);
-  }
+  install(this);
 }
 
 /**
@@ -588,10 +582,26 @@ function spliceOutItem(items, object) {
  * @private
  */
 
-function install(receiver) {
+function install(receiver, force) {
+  var added = [];
   for (var prop in exports) {
-    if (prop.match(/^\$/)) receiver[prop] = exports[prop];
+    if (force || typeof receiver[prop] === 'undefined') {
+      receiver[prop] = exports[prop];
+      added.push(prop);
+    } else {
+      console.debug(
+        'Failed to install DebugUtils globally, because %s existed. ' +
+        'Run debugUtils.global() to force install on the global namespace.',
+        prop
+      );
+      added.forEach(function(prop) {
+        receiver[prop] = undefined;
+      }, receiver);
+      exports.global = install.bind(null, receiver, true);
+      break;
+    }
   }
+  receiver.debugUtils = exports;
 }
 
 }).call(Function('return this')());
