@@ -15,12 +15,10 @@ Log and break on:
 The easiest way to install is to grab the [chrome extension](https://chrome.google.com/webstore/detail/djailkkojeahmihdpcelmmobkpepmkcl) which will add the
 utility functions (described below) to your JavaScript console.
 
-### Script
+### Script Tag
 
-Grab `du.js` and add it in script tag on your page, which will make all the
-the functions (described below) available under the `window.debugUtils`
-namespace. To import the functions to the global namespace simply call
-`debugUtils.global()`.
+Grab `du.js` and add it in script tag to your page, which will make all the
+the functions (described below) available globally.
 
 ### Node.js
 
