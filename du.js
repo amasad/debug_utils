@@ -589,14 +589,6 @@ function install(receiver, force) {
       receiver[prop] = exports[prop];
       added.push(prop);
     } else {
-      console.debug(
-        'Failed to install DebugUtils globally, because %s existed. ' +
-        'Run debugUtils.global() to force install on the global namespace.',
-        prop
-      );
-      added.forEach(function(prop) {
-        receiver[prop] = undefined;
-      }, receiver);
       exports.global = install.bind(null, receiver, true);
       break;
     }

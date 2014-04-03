@@ -7,14 +7,7 @@ var EventEmitter = require('events').EventEmitter;
 describe('install', function() {
 
   beforeEach(function() {
-    this.consoleCalled = false;
-    this.sandbox = {
-      console: {
-        debug: function(){
-          this.consoleCalled = true;
-        }.bind(this)
-      }
-    };
+    this.sandbox = {};
     this.run = function() {
       this.context = vm.createContext(this.sandbox);
       vm.runInContext(
@@ -37,7 +30,6 @@ describe('install', function() {
     var context = this.context;
     assert(context.$dum === 'foo', 'failed not replace $dum');
     assert(!(context.$duv && context.$dus), 'failed not install');
-    assert(this.consoleCalled);
   });
 
   it('should force install when global is called', function() {
