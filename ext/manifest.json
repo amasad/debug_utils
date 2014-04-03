@@ -1,6 +1,6 @@
 {
   "name": "Debug Utils",
-  "version": "0.4",
+  "version": "0.5",
   "description": "Extra command line api goodness",
   "devtools_page": "devtools.html",
   "manifest_version": 2
