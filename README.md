@@ -57,13 +57,13 @@ to debug. The following utilities should help you:
 
 ### $duv(object, event)
 
-Attach an event handler that starts debugger when trigerred.
+Attach an event handler that starts debugger when triggered.
 
 Usesful for:
 
-* Making sure the event is being trigerred.
+* Making sure the event is being triggered.
 * Stepping through other event handlers.
-* Finding out what trigerred the event.
+* Finding out what triggered the event.
 
 ### $duvl(object, event)
 
