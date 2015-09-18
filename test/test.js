@@ -24,6 +24,28 @@ describe('install', function() {
     assert(context.$duv && context.$dum && context.$dus);
   });
 
+  it('should install all the human readable functions on the global NS', function() {
+    this.run();
+    var context = this.context;
+    assert(
+      context.$duEvent &&
+      context.$duEventLogger &&
+      context.$duEventRemove &&
+      context.$duWrapMethod &&
+      context.$duWrapMethodLogger &&
+      context.$duWrapMethodRemove &&
+	  context.$duGetter &&
+	  context.$duGetterLogger &&
+	  context.$duGetterRemove &&
+	  context.$duAccessor &&
+	  context.$duAccessorLogger &&
+	  context.$duAccessorRemove &&
+	  context.$duSetter &&
+	  context.$duSetterLogger &&
+	  context.$duSetterRemove
+	);
+  });
+
   it('should handle conflicts', function() {
     this.sandbox.$dum = 'foo';
     this.run();
