@@ -34,16 +34,16 @@ describe('install', function() {
       context.$duWrapMethod &&
       context.$duWrapMethodLogger &&
       context.$duWrapMethodRemove &&
-	  context.$duGetter &&
-	  context.$duGetterLogger &&
-	  context.$duGetterRemove &&
-	  context.$duAccessor &&
-	  context.$duAccessorLogger &&
-	  context.$duAccessorRemove &&
-	  context.$duSetter &&
-	  context.$duSetterLogger &&
-	  context.$duSetterRemove
-	);
+      context.$duGetter &&
+      context.$duGetterLogger &&
+      context.$duGetterRemove &&
+      context.$duAccessor &&
+      context.$duAccessorLogger &&
+      context.$duAccessorRemove &&
+      context.$duSetter &&
+      context.$duSetterLogger &&
+      context.$duSetterRemove
+    );
   });
 
   it('should handle conflicts', function() {
