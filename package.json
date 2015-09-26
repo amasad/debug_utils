@@ -1,6 +1,6 @@
 {
   "name": "debug_utils",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Useful utilities library for command-line JavaScript debugging ",
   "main": "du.js",
   "directories": {
