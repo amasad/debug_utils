@@ -8,18 +8,38 @@ var exports = {
   $duv: $duv,
   $duvl: $duvl,
   $duvr: $duvr,
+  $duEvent: $duv,
+  $duEventLogger: $duvl,
+  $duEventRemove: $duvr,
+
   $dum: $dum,
   $duml: $duml,
   $dumr: $dumr,
+  $duWrapMethod: $dum,
+  $duWrapMethodLogger: $duml,
+  $duWrapMethodRemove: $dumr,
+
   $dug: $dug,
   $dugl: $dugl,
   $dugr: $dugr,
+  $duGetter: $dug,
+  $duGetterLogger: $dugl,
+  $duGetterRemove: $dugr,
+
   $dus: $dus,
   $dusl: $dusl,
   $dusr: $dusr,
+  $duAccessor: $dus,
+  $duAccessorLogger: $dusl,
+  $duAccessorRemove: $dusr,
+
   $dugs: $dugs,
   $dugsl: $dugsl,
   $dugsr: $dugsr,
+  $duSetter: $dugs,
+  $duSetterLogger: $dugsl,
+  $duSetterRemove: $dugsr,
+
   $dudebug: $dudebug,
   $dulog: $dulog,
   $dulogm: $dulogm
